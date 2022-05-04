@@ -36,11 +36,6 @@ Thunder however, requires that the configuration file for the plugin needs to be
 
 **TODO** Check this. Is there a way to configure Thunder to search other directories for plugin config files?
 
-```
-cd ${THUNDER_ROOT}/thunder_rs/examples
-cargo build
-cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world/SampleRustPlugin.json ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins
-```
 
 #### **4. Run the HelloWorld Rust plugin**
 
