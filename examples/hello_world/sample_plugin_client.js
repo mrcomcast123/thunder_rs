@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const client = new WebSocket("ws://127.0.0.1:55555/Service/rustplugin", ["jsonrpc"]);
+const client = new WebSocket("ws://127.0.0.1:55555/Service/hello_world", ["jsonrpc"]);
 
 next_id = 10
 
