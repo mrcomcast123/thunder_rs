@@ -56,7 +56,7 @@ ${THUNDER_INSTALL_DIR/usr/bin/WPEFramework -c ${THUNDER_INSTALL_DIR}/etc/WPEFram
 There's a nodejs application in the examples directory that can be used to test out the HelloWorld plugin. That app makes a WebSocket connection to Thunder and repeatedly (1/sec) sends JSON/RPC requests to the plugin and gets "Hell from rust" back. 
 
 ```
-cd ${THUNDER_ROOT}/thunder_rs/examples/hello_work
+cd ${THUNDER_ROOT}/thunder_rs/examples/hello_world
 npm install ws
 node sample_plugin_client.js
 ```
