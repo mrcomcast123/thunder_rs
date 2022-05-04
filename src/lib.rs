@@ -22,7 +22,7 @@ use std::os::raw::{c_char, c_void};
 
 type SendToFunction = unsafe extern "C" fn (u32, *const c_char, plugin_ctx: *const c_void);
 
-pub trait MessageSender {
+pub trait PluginProtocol {
   fn send_to(&self,  channel_id: u32, json: String);
 }
 
@@ -40,7 +40,7 @@ pub struct RequestContext {
 pub struct ServiceMetadata {
   pub name: &'static str,
   pub version: (u32, u32, u32),
-  pub create: fn (Box<dyn MessageSender>) -> Box<dyn Plugin>
+  pub create: fn (Box<dyn PluginProtocol>) -> Box<dyn Plugin>
 }
 
 #[macro_export]
@@ -79,12 +79,12 @@ pub struct CPlugin {
   pub plugin: Box<dyn Plugin>
 }
 
-struct DefaultMessageSender {
+struct DefaultPluginProtocol {
   send_func: SendToFunction,
   send_ctx: *const c_void
 }
 
-impl MessageSender for DefaultMessageSender {
+impl PluginProtocol for DefaultPluginProtocol {
   fn send_to(&self, channel_id: u32, json: String) {
     let c_str = CString::new(json).unwrap();
     unsafe {
@@ -117,11 +117,11 @@ pub extern fn wpe_rust_plugin_create(_name: *const c_char, send_func: SendToFunc
   assert!(!meta_data.is_null());
 
   let service_metadata = unsafe{ &mut *meta_data };
-  let sender: Box<dyn MessageSender> = Box::new(DefaultMessageSender{
+  let proto: Box<dyn PluginProtocol> = Box::new(DefaultPluginProtocol {
     send_func: send_func,
     send_ctx: plugin_ctx});
 
-  let plugin: Box<dyn Plugin> = (service_metadata.create)(sender);
+  let plugin: Box<dyn Plugin> = (service_metadata.create)(proto);
   let name: String = service_metadata.name.to_string();
   let c_plugin: Box<CPlugin> = Box::new(CPlugin {
     name: name,
