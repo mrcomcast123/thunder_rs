@@ -15,20 +15,21 @@ make -C build/thunder_rs && make -C build/thunder_rs install
 
 # build example rust plugin
 
-cd ${THUNDER_ROOT}/thunder_rs/examples
-cargo update
-cargo build
-cp ${THUNDER_ROOT}/thunder_rs/examples/target/debug/deps/*.so ${THUNDER_INSTALL_DIR}/usr/lib/
+cargo build --manifest-path ${THUNDER_ROOT}/thunder_rs/examples/Cargo.toml --target-dir ${THUNDER_ROOT}/build/thunder_rs/examples
+cp ${THUNDER_ROOT}/build/thunder_rs/examples/debug/deps/*.so ${THUNDER_INSTALL_DIR}/usr/lib/
 cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world/SampleRustPlugin.json ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins
-cd ${THUNDER_ROOT}
 
 # run thunder
 
 PATH=${THUNDER_INSTALL_DIR}/usr/bin:${PATH} LD_LIBRARY_PATH=${THUNDER_INSTALL_DIR}/usr/lib:${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib:${LD_LIBRARY_PATH} WPEFramework -c ${THUNDER_INSTALL_DIR}/etc/WPEFramework/config.json
 
 # test with example client
-cd ${THUNDER_ROOT}/thunder_rs/examples/hello_work
+mkdir ${THUNDER_ROOT}/sample_plugin_client
+cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world/sample_plugin_client.js ${THUNDER_ROOT}/sample_plugin_client
+pushd ${THUNDER_ROOT}/sample_plugin_client
 npm install ws
 node sample_plugin_client.js
+ctrl+c to end
+popd
 
 
