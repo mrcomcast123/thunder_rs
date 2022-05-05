@@ -56,6 +56,10 @@ macro_rules! export_plugin {
   };
 }
 
+//===============================================================================
+// Internal code only below here
+//===============================================================================
+
 #[repr(C)]
 pub struct CRequestContext {
   channel_id: u32,
@@ -116,7 +120,7 @@ pub extern fn wpe_rust_plugin_create(_name: *const c_char, send_func: SendToFunc
 {
   assert!(!meta_data.is_null());
 
-  let service_metadata = unsafe{ &mut *meta_data };
+  let service_metadata = unsafe{ &*meta_data };
   let proto: Box<dyn PluginProtocol> = Box::new(DefaultPluginProtocol {
     send_func: send_func,
     send_ctx: plugin_ctx});
@@ -134,6 +138,7 @@ pub extern fn wpe_rust_plugin_create(_name: *const c_char, send_func: SendToFunc
 #[no_mangle]
 pub extern fn wpe_rust_plugin_destroy(ptr: *mut CPlugin) {
   assert!(!ptr.is_null());
+
   unsafe {
     drop(Box::from_raw(ptr));
   }
@@ -155,20 +160,52 @@ pub extern fn wpe_rust_plugin_invoke(ptr: *mut CPlugin, json_req: *const c_char,
   assert!(!ptr.is_null());
   assert!(!json_req.is_null());
 
-  let plugin = unsafe{ &mut *ptr };
-  plugin.on_incoming_message(json_req, req_ctx);
+  let plugin = unsafe{ &*ptr };
+  let uncaught_error = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+    plugin.on_incoming_message(json_req, req_ctx);
+  }));
+
+  match uncaught_error {
+    Err(cause) => {
+      println!("Error calling on_incoming_message");
+      println!("{:?}", cause);
+    }
+    Ok(_) => { }
+  }
 }
 
 #[no_mangle]
 pub extern fn wpe_rust_plugin_on_client_connect(ptr: *mut CPlugin, channel_id: u32) {
   assert!(!ptr.is_null());
-  let plugin = unsafe{ &mut *ptr };
-  plugin.on_client_connect(channel_id);
+
+  let plugin = unsafe{ &*ptr };
+  let uncaught_error = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+    plugin.on_client_connect(channel_id);
+  }));
+
+  match uncaught_error {
+    Err(cause) => {
+      println!("Error calling on_client_connect");
+      println!("{:?}", cause);
+    }
+    Ok(_) => { }
+  }
 }
 
 #[no_mangle]
 pub extern fn wpe_rust_plugin_on_client_disconnect(ptr: *mut CPlugin, channel_id: u32) {
   assert!(!ptr.is_null());
-  let plugin = unsafe{ &mut *ptr };
-  plugin.on_client_disconnect(channel_id);
+
+  let plugin = unsafe{ &*ptr };
+  let uncaught_error = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+    plugin.on_client_disconnect(channel_id);
+  }));
+
+  match uncaught_error {
+    Err(cause) => {
+      println!("Error calling on_client_disconnect");
+      println!("{:?}", cause);
+    }
+    Ok(_) => { }
+  }
 }

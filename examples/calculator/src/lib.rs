@@ -1,16 +1,68 @@
-
+/*
+ * If not stated otherwise in this file or this component's LICENSE file the
+ * following copyright and licenses apply:
+ *
+ * Copyright 2022 RDK Management
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 struct Calculator { 
   proto: Box<dyn thunder_rs::PluginProtocol>
 }
 
 impl Calculator {
   fn dispatch_request(&self, req: json::JsonValue, ctx: thunder_rs::RequestContext) {
-    let method = &req["method"];
-    println!("method:{}", method);
+    if let Some(method) = req["method"].as_str() {
+      match method {
+        "calculator.add" => { self.add(req, ctx); }
+        "calculator.mul" => { self.mul(req, ctx); }
+        _ => {
+          println!("method {} not handled here", method);
+        }
+      }
+    }
+  }
 
-    let s: String = String::from("{\"jsonrpc\":\"2.0\", \"id\":4, \"result\":\"hello from rust\"}");
-    let res: json::JsonValue = json::parse(s.as_str())
-      .unwrap();
+  fn add(&self, req: json::JsonValue, ctx: thunder_rs::RequestContext) {
+    let mut sum = 0;
+    for val in req["params"].members() {
+      if let Some(n) = val.as_u32() {
+        sum += n;
+      }
+    }
+
+    let res = json::object!{
+      "jsonrpc": "2.0",
+      "id": req["id"].as_u32(),
+      "result": sum
+    };
+
+    self.send_response(res, ctx);
+  }
+
+  fn mul(&self, req: json::JsonValue, ctx: thunder_rs::RequestContext) {
+    let mut product = 0;
+    for val in req["params"].members() {
+      if let Some(n) = val.as_u32() {
+        product *= n
+      }
+    }
+
+    let res = json::object!{
+      "jsonrpc": "2.0",
+      "id": req["id"].as_u32(),
+      "result": product
+    };
 
     self.send_response(res, ctx);
   }
