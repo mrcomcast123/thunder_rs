@@ -1,13 +1,15 @@
 [package]
-name = "thunder_rs"
+name = "calculator"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+thunder_rs = { path = "../../" }
+json = { version = "0.12.4" }
 
 [lib]
-name = "thunder_rs"
-crate-type = ["lib"]
-path = "sdk/lib.rs"
+name        = "calculator"
+path        = "src/lib.rs"
+crate-type  = ["dylib"]
