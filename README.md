@@ -60,7 +60,6 @@ Thunder however, requires that the configuration file for the plugin be installe
 
 ```
 git clone https://github.com/rdkcentral/thunder_rs.git -b sprint/2205
-cargo update --manifest-path ${THUNDER_ROOT}/thunder_rs/examples/hello_world/Cargo.toml
 cargo build --manifest-path ${THUNDER_ROOT}/thunder_rs/examples/hello_world/Cargo.toml --target-dir ${THUNDER_ROOT}/build/thunder_rs/examples/hello_world
 cp ${THUNDER_ROOT}/build/thunder_rs/examples/hello_world/debug/libhello_world.so ${THUNDER_INSTALL_DIR}/usr/lib/plugins
 cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world\SampleRustPlugin.json ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins
@@ -84,7 +83,8 @@ popd
 
 ```
 PATH=${THUNDER_INSTALL_DIR}/usr/bin:${PATH} \
-LD_LIBRARY_PATH=${THUNDER_INSTALL_DIR}/usr/lib:${THUNDER_INSTALL_DIR}/usr/lib/plugins:${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib:${LD_LIBRARY_PATH} \ WPEFramework -c ${THUNDER_INSTALL_DIR}/etc/WPEFramework/config.json
+LD_LIBRARY_PATH=${THUNDER_INSTALL_DIR}/usr/lib:${THUNDER_INSTALL_DIR}/usr/lib/plugins:${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib:${LD_LIBRARY_PATH} \
+WPEFramework -c ${THUNDER_INSTALL_DIR}/etc/WPEFramework/config.json
 ```
 
 Verify the plugin loads by looking for output like this:
@@ -117,23 +117,12 @@ recv:{"jsonrpc":"2.0","id":4,"result":"hello from rust"}
 
 To end the test hit 'q' in the WPEFramework console.
 
-### build rust remote process
-
-The previous step ran the Rust plugin in the same process as WPEFramework. To run it out of process we need to build the rust remote process app which the RustAdapter thunder plugin will spawn.  Additionally, the outofprocess_rust field in ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins/SampleRustPlugin.json must be set to true.
-
-```
-cargo update --manifest-path ${THUNDER_ROOT}/thunder_rs/remote/Cargo.toml
-cargo build --manifest-path ${THUNDER_ROOT}/thunder_rs/remote/Cargo.toml --target-dir ${THUNDER_ROOT}/build/thunder_rs/remote
-cp ${THUNDER_ROOT}/build/thunder_rs/remote/debug/RustAdapterProcess ${THUNDER_INSTALL_DIR}/usr/bin
-```
-
-Edit ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins/SampleRustPlugin.json and set:
-```
-"outofprocess_rust": true
-```
 ### Test out of process
 
-Just repeat steps "Launch WPEFramework" and "Launch the sample client" and verify results
+The previous step ran the Rust plugin in the same process as WPEFramework. To run it out of process the outofprocess, set
+the "outofprocess" field to true in ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins/SampleRustPlugin.json
+
+To test, repeat steps "Launch WPEFramework" and "Launch the sample client" and verify results.
 
 # TODO
 - Check this. Is there a way to configure Thunder to search other directories for plugin config files?
