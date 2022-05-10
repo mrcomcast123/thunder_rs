@@ -1,6 +1,10 @@
 # thunder_rs
 
-# prerequisite build Thunder following steps 1 and 2 from https://github.com/rdkcentral/Thunder
+# Desktop build and run instructions
+
+### Using Thunder WPEFramework 
+
+## prerequisite build Thunder following steps 1 and 2 from https://github.com/rdkcentral/Thunder
 
 # build thunder RustAdapter service
 
@@ -24,6 +28,7 @@ cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world/SampleRustPlugin.json ${THUND
 PATH=${THUNDER_INSTALL_DIR}/usr/bin:${PATH} LD_LIBRARY_PATH=${THUNDER_INSTALL_DIR}/usr/lib:${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib:${LD_LIBRARY_PATH} WPEFramework -c ${THUNDER_INSTALL_DIR}/etc/WPEFramework/config.json
 
 # test with example client
+
 mkdir ${THUNDER_ROOT}/sample_plugin_client
 cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world/sample_plugin_client.js ${THUNDER_ROOT}/sample_plugin_client
 pushd ${THUNDER_ROOT}/sample_plugin_client
@@ -33,3 +38,8 @@ ctrl+c to end
 popd
 
 
+# build rust remote process
+
+cargo update --manifest-path ${THUNDER_ROOT}/thunder_rs/service/remote_process/Cargo.toml
+cargo build --manifest-path ${THUNDER_ROOT}/thunder_rs/service/remote_process/Cargo.toml --target-dir ${THUNDER_ROOT}/build/thunder_rs/service/remote_process
+cp ${THUNDER_ROOT}/build/thunder_rs/service/remote_process/debug/RustAdapterProcess ${THUNDER_INSTALL_DIR}/usr/bin
