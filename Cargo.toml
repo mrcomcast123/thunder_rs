@@ -10,4 +10,3 @@ edition = "2021"
 [lib]
 name = "thunder_rs"
 crate-type = ["lib"]
-path = "sdk/lib.rs"

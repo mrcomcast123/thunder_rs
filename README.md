@@ -52,9 +52,15 @@ make -C build/rdkservices && make -C build/rdkservices install
 Confirm that `${THUNDER_INSTALL_DIR}/usr/lib/wpeframework/plugins/libWPEFrameworkRustAdapter.so` exists. This is the acutal
 Thunder plugin that bridges (adapts) the native C++ interaces to rust traits, structs, and other types.
 
+Confirm that `${THUNDER_INSTALL_DIR}/usr/bin/rust_adapter_process` exist.  This is the remote process which we be spawned
+when running the plugin in outofprocess mode.
+
 ## Build and install the example plugin (rust plugin)
 
-The next build step should procude libarary named `libhello_world.so` in the build tree. This is the actual rust plugin. This file and any dependencies that you may have added are required to be in the `LD_LIBRARY_PATH`. To run like normal C++ plugins, we suggest that this be placed into the plugins directory under the ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins, but this is not strictly necessary and is inconvenient during edit, compile, test cycles.
+The next build step should produce a libarary named `libhello_world.so` in the build tree. This is the actual rust plugin. 
+This file and any dependencies that you may have added are required to be in the `LD_LIBRARY_PATH`. 
+To run like normal C++ plugins, we suggest that this be placed into the plugins directory under the 
+${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins, but this is not strictly necessary and is inconvenient during edit, compile, test cycles.
 
 Thunder however, requires that the configuration file for the plugin be installed into ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins directory.
 
@@ -67,7 +73,8 @@ cp ${THUNDER_ROOT}/thunder_rs/examples/hello_world\SampleRustPlugin.json ${THUND
 
 ## test with example client
 
-There's a nodejs application in the examples directory that can be used to test out the HelloWorld plugin. This app makes a WebSocket connection to Thunder and repeatedly (1/sec) sends JSON/RPC requests to the plugin and gets "Hell from rust" back. 
+There's a nodejs application in the examples directory that can be used to test out the HelloWorld plugin. 
+This app makes a WebSocket connection to Thunder and repeatedly (1/sec) sends JSON/RPC requests to the plugin and gets "Hell from rust" back. 
 
 ### Setup the sample client
 
@@ -83,7 +90,7 @@ popd
 
 ```
 PATH=${THUNDER_INSTALL_DIR}/usr/bin:${PATH} \
-LD_LIBRARY_PATH=${THUNDER_INSTALL_DIR}/usr/lib:${THUNDER_INSTALL_DIR}/usr/lib/plugins:${HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib:${LD_LIBRARY_PATH} \
+LD_LIBRARY_PATH=${THUNDER_INSTALL_DIR}/usr/lib:${THUNDER_INSTALL_DIR}/usr/lib/plugins:${LD_LIBRARY_PATH} \
 WPEFramework -c ${THUNDER_INSTALL_DIR}/etc/WPEFramework/config.json
 ```
 
@@ -112,7 +119,6 @@ send:{"jsonrpc":"2.0","id":10,"method":"keyboard.onKeyPress","params":{"a":"a","
 recv:{"jsonrpc":"2.0","id":4,"result":"hello from rust"}
 send:{"jsonrpc":"2.0","id":11,"method":"settings.onRequestSettings","params":[1,2,3,4,5]}
 recv:{"jsonrpc":"2.0","id":4,"result":"hello from rust"}
-...
 ```
 
 To end the test hit 'q' in the WPEFramework console.
@@ -123,6 +129,20 @@ The previous step ran the Rust plugin in the same process as WPEFramework. To ru
 the "outofprocess" field to true in ${THUNDER_INSTALL_DIR}/etc/WPEFramework/plugins/SampleRustPlugin.json
 
 To test, repeat steps "Launch WPEFramework" and "Launch the sample client" and verify results.
+
+# Extra Commands:
+
+## Build the rust_adapter_process directly
+
+### To pick up new changes from thunder_rs repo
+cargo update --manifest-path ${THUNDER_ROOT}/rdkservices/RustAdapter/rust_adapter_process/Cargo.toml
+
+### Build it
+cargo build --manifest-path ${THUNDER_ROOT}/rdkservices/RustAdapter/rust_adapter_process/Cargo.toml \
+--target-dir ${THUNDER_ROOT}/build/rdkservices/RustAdapter/rust_adapter_process
+
+cp ${THUNDER_ROOT}/build/rdkservices/RustAdapter/rust_adapter_process/debug/rust_adapter_process ${THUNDER_INSTALL_DIR}/usr/bin
+
 
 # TODO
 - Check this. Is there a way to configure Thunder to search other directories for plugin config files?
